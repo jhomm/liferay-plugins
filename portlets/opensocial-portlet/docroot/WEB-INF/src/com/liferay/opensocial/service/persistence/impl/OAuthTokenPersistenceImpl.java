@@ -1186,8 +1186,8 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 		}
 	}
 
-	protected void cacheUniqueFindersCache(OAuthToken oAuthToken) {
-		if (oAuthToken.isNew()) {
+	protected void cacheUniqueFindersCache(OAuthToken oAuthToken, boolean isNew) {
+		if (isNew) {
 			Object[] args = new Object[] {
 					oAuthToken.getUserId(), oAuthToken.getGadgetKey(),
 					oAuthToken.getServiceName(), oAuthToken.getModuleId(),
@@ -1430,7 +1430,7 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 			OAuthTokenImpl.class, oAuthToken.getPrimaryKey(), oAuthToken, false);
 
 		clearUniqueFindersCache(oAuthToken);
-		cacheUniqueFindersCache(oAuthToken);
+		cacheUniqueFindersCache(oAuthToken, isNew);
 
 		oAuthToken.resetOriginalValues();
 
@@ -1816,6 +1816,11 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 		}
 
 		return count.intValue();
+	}
+
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return OAuthTokenModelImpl.TABLE_COLUMNS_MAP;
 	}
 
 	/**

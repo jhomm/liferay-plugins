@@ -175,6 +175,15 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		}
 	}
 
+	public BaseModel<?> fetchBaseModel(String className, long classPK)
+		throws Exception {
+
+		AlloyServiceInvoker alloyServiceInvoker = new AlloyServiceInvoker(
+			className);
+
+		return alloyServiceInvoker.fetchModel(classPK);
+	}
+
 	@Override
 	public Portlet getPortlet() {
 		return portlet;
@@ -208,8 +217,9 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 			indexer.reindex(baseModel);
 		}
 		else {
-			Indexer baseModelIndexer = IndexerRegistryUtil.getIndexer(
-				baseModel.getModelClass());
+			Indexer<BaseModel<?>> baseModelIndexer =
+				(Indexer<BaseModel<?>>)IndexerRegistryUtil.getIndexer(
+					baseModel.getModelClass());
 
 			if (baseModelIndexer != null) {
 				baseModelIndexer.reindex(baseModel);
@@ -312,7 +322,8 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		SessionMessages.add(
 			request,
 			portlet.getPortletId() +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA, data);
+				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA,
+			data);
 	}
 
 	protected void addSuccessMessage() {
@@ -349,7 +360,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		return sb.toString();
 	}
 
-	protected Indexer buildIndexer() {
+	protected Indexer<BaseModel<?>> buildIndexer() {
 		return null;
 	}
 
@@ -624,7 +635,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 
 		PortletBag portletBag = PortletBagPool.get(portlet.getPortletId());
 
-		List<Indexer> indexerInstances = portletBag.getIndexerInstances();
+		List<Indexer<?>> indexerInstances = portletBag.getIndexerInstances();
 
 		if (existingIndexer != null) {
 			IndexerRegistryUtil.unregister(existingIndexer);
@@ -1260,7 +1271,8 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		SessionMessages.add(
 			request,
 			portlet.getPortletId() +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA, data);
+				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET_DATA,
+			data);
 	}
 
 	protected void setPermissioned(boolean permissioned) {
@@ -1399,7 +1411,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 	protected EventRequest eventRequest;
 	protected EventResponse eventResponse;
 	protected String format;
-	protected Indexer indexer;
+	protected Indexer<BaseModel<?>> indexer;
 	protected String indexerClassName;
 	protected String lifecycle;
 	protected LiferayPortletConfig liferayPortletConfig;

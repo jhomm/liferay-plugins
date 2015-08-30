@@ -1271,8 +1271,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	}
 
 	protected void cacheUniqueFindersCache(
-		PushNotificationsDevice pushNotificationsDevice) {
-		if (pushNotificationsDevice.isNew()) {
+		PushNotificationsDevice pushNotificationsDevice, boolean isNew) {
+		if (isNew) {
 			Object[] args = new Object[] { pushNotificationsDevice.getToken() };
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_TOKEN, args,
@@ -1437,7 +1437,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 				pushNotificationsDevice.setNew(false);
 			}
 			else {
-				session.merge(pushNotificationsDevice);
+				pushNotificationsDevice = (PushNotificationsDevice)session.merge(pushNotificationsDevice);
 			}
 		}
 		catch (Exception e) {
@@ -1481,8 +1481,9 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			pushNotificationsDevice.getPrimaryKey(), pushNotificationsDevice,
 			false);
 
-		clearUniqueFindersCache(pushNotificationsDevice);
-		cacheUniqueFindersCache(pushNotificationsDevice);
+		clearUniqueFindersCache((PushNotificationsDevice)pushNotificationsDeviceModelImpl);
+		cacheUniqueFindersCache((PushNotificationsDevice)pushNotificationsDeviceModelImpl,
+			isNew);
 
 		pushNotificationsDevice.resetOriginalValues();
 
@@ -1864,6 +1865,11 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 		}
 
 		return count.intValue();
+	}
+
+	@Override
+	protected Map<String, Integer> getTableColumnsMap() {
+		return PushNotificationsDeviceModelImpl.TABLE_COLUMNS_MAP;
 	}
 
 	/**
